@@ -73,6 +73,31 @@ router.patch("/mark-sms-read", protect, async (req, res) => {
 });
 
 /**
+ * @route   PATCH /api/notifications/mark-polls-read
+ * @desc    Mark all poll notifications as read for user
+ * @access  Protected
+ */
+router.patch("/mark-polls-read", protect, async (req, res) => {
+  try {
+    const result = await Notification.updateMany(
+      {
+        userId: req.user._id,
+        read: false,
+        $or: [{ type: "poll" }, { relatedEntityType: "poll" }],
+      },
+      { read: true, readAt: new Date() }
+    );
+
+    res.json({
+      message: "Poll notifications marked as read",
+      modifiedCount: result.modifiedCount,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+/**
  * @route   PATCH /api/notifications/mark-verification-read
  * @desc    Mark all verification status notifications as read for user
  * @access  Protected

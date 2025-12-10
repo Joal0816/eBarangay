@@ -244,8 +244,13 @@ const Announcements = () => {
                 <Megaphone className="h-7 w-7 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-white drop-shadow leading-tight">
+                <h1 className="text-3xl font-bold text-white drop-shadow leading-tight flex items-center gap-3">
                   Announcements
+                  {unreadAnnouncementCount > 0 && (
+                    <Badge className="bg-red-500 text-white border-none shadow-lg animate-pulse">
+                      {unreadAnnouncementCount} New
+                    </Badge>
+                  )}
                 </h1>
                 <p className="text-sm text-blue-100 mt-1">
                   Check latest barangay updates
@@ -478,12 +483,6 @@ const Announcements = () => {
                       onClick={() => viewDetails(announcement)}
                       style={{ animationDelay: `${idx * 50}ms` }}
                     >
-                      {isAnnouncementUnread(announcement._id) && (
-                        <div className="absolute top-3 right-3 z-10 flex items-center gap-2 rounded-full bg-blue-100 text-blue-800 px-3 py-1 text-xs font-semibold shadow-sm">
-                          <span className="h-2 w-2 rounded-full bg-blue-600" />
-                          Unread
-                        </div>
-                      )}
                       <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl" />
                       <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-blue-300/5 to-blue-300/5 rounded-full blur-3xl" />
                       <CardHeader className="relative pb-4">
@@ -491,11 +490,18 @@ const Announcements = () => {
                           <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 shadow-lg group-hover:shadow-xl">
                             <Newspaper className="w-7 h-7 text-white" />
                           </div>
-                          {announcement.priority === "high" && (
-                            <Badge className="bg-red-500/90 hover:bg-red-600 shadow-sm text-white">
-                              High Priority
-                            </Badge>
-                          )}
+                          <div className="flex flex-col items-end gap-2">
+                            {isAnnouncementUnread(announcement._id) && (
+                              <Badge className="bg-blue-500 hover:bg-blue-600 shadow-sm text-white animate-pulse">
+                                Unread
+                              </Badge>
+                            )}
+                            {announcement.priority === "high" && (
+                              <Badge className="bg-red-500/90 hover:bg-red-600 shadow-sm text-white">
+                                High Priority
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                         <CardTitle className="text-lg text-blue-900 group-hover:text-blue-700 transition-colors font-bold leading-tight">
                           {announcement.title}

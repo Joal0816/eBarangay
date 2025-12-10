@@ -30,6 +30,7 @@ const NotificationsEnhanced = () => {
   const [smsAlerts, setSmsAlerts] = useState<SmsAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadSmsCount, setUnreadSmsCount] = useState(0);
+  const [unreadSmsIds, setUnreadSmsIds] = useState<string[]>([]);
   const [markingAll, setMarkingAll] = useState(false);
 
   useEffect(() => {
@@ -56,25 +57,40 @@ const NotificationsEnhanced = () => {
 
   const fetchData = async () => {
     try {
-      const smsData = await sms.getAll(1, 50);
+      // Fetch SMS alerts and specifically unread SMS notifications
+      const [smsData, unreadSmsData, unreadCount] = await Promise.all([
+        sms.getAll(1, 50),
+        notifications.getAll(1, 100, true, "sms"),
+        notifications.getUnreadCount("sms"),
+      ]);
+      
       setSmsAlerts(smsData.alerts || []);
 
+      // Process unread notifications to get IDs
+      const unreadList = unreadSmsData?.notifications || [];
+      console.log("🔔 Unread SMS notifications:", unreadList);
+
+      const unreadIds = unreadList
+        .filter((n: any) => n?.relatedEntityId)
+        .map((n: any) => String(n.relatedEntityId));
+      
+      console.log("🔔 Extracted unread IDs:", unreadIds);
+      
+      setUnreadSmsIds(unreadIds);
+
       // Fetch unread SMS count
-      const unreadCount = await notifications.getUnreadCount("sms");
       console.log(
         "📱 SMS Notifications - Unread count API response:",
         unreadCount
       );
       setUnreadSmsCount(unreadCount?.count || 0);
-      console.log(
-        "📱 SMS Notifications - State updated to:",
-        unreadCount?.count || 0
-      );
     } catch (error: any) {
       toast.error(error.message || "Error fetching SMS alerts");
     } finally {
       setLoading(false);
     }
+  };  const isSmsUnread = (id: string) => {
+    return unreadSmsIds.includes(String(id));
   };
 
   const handleMarkAllRead = async () => {
@@ -86,6 +102,7 @@ const NotificationsEnhanced = () => {
 
       // Update local state
       setUnreadSmsCount(0);
+      setUnreadSmsIds([]);
       console.log("📱 SMS unread count set to 0");
 
       // Dispatch event to update dashboard badge
@@ -134,8 +151,13 @@ const NotificationsEnhanced = () => {
                 <Bell className="h-7 w-7 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-white drop-shadow leading-tight">
+                <h1 className="text-3xl font-bold text-white drop-shadow leading-tight flex items-center gap-3">
                   SMS Alerts
+                  {unreadSmsCount > 0 && (
+                    <Badge className="bg-red-500 text-white border-none shadow-lg animate-pulse">
+                      {unreadSmsCount} New
+                    </Badge>
+                  )}
                 </h1>
                 <p className="text-sm text-blue-100 mt-1">
                   View important messages from barangay officials
@@ -182,16 +204,27 @@ const NotificationsEnhanced = () => {
             smsAlerts.map((alert) => (
               <Card
                 key={alert._id}
-                className="hover:shadow-md transition-shadow"
+                className={`hover:shadow-md transition-shadow ${
+                  isSmsUnread(alert._id)
+                    ? "border-blue-500 shadow-blue-100"
+                    : ""
+                }`}
               >
-                <CardContent className="p-5">
+                <CardContent className="p-5 relative">
+                  {isSmsUnread(alert._id) && (
+                    <div className="absolute top-5 right-5 z-10">
+                      <Badge className="bg-blue-500 hover:bg-blue-600 shadow-sm text-white animate-pulse">
+                        Unread
+                      </Badge>
+                    </div>
+                  )}
                   <div className="flex items-start gap-4">
                     <div className="p-3 rounded-full bg-blue-100">
                       <Megaphone className="w-5 h-5 text-blue-600" />
                     </div>
 
                     <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-start justify-between mb-2 pr-20">
                         <h3 className="font-semibold text-lg">{alert.title}</h3>
                         <Badge
                           variant="outline"
