@@ -200,12 +200,13 @@ const Polls = () => {
       setActivePolls(processedActive);
       setClosedPolls(processedClosed);
 
-      // REMOVED: Auto-marking as read on page load
-      // Now users need to explicitly vote on polls to mark notifications as read
-      // This allows the dashboard badge to show before they're marked as read
-
-      // Dispatch event to update notification counter globally
-      window.dispatchEvent(new Event("pollsViewed"));
+      // Mark polls as read when viewing the list
+      try {
+        await notifications.markPollsAsRead();
+        window.dispatchEvent(new Event("pollsViewed"));
+      } catch (error) {
+        console.error("Error marking polls as read:", error);
+      }
     } catch (error: any) {
       console.error("❌ Error fetching polls:", error);
       toast.error(error.message || "Error fetching polls");

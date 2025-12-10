@@ -188,6 +188,12 @@ const Dashboard = () => {
       fetchUserActivity();
     };
 
+    // Listen for when polls are viewed (to clear badge)
+    const handlePollsViewed = () => {
+      console.log("🗳️ Polls viewed event received - refreshing badge...");
+      fetchUserActivity();
+    };
+
     // Listen for when a user votes on a poll
     const handlePollVoted = () => {
       console.log("🗳️ Poll voted event received - decrementing badge...");
@@ -211,6 +217,7 @@ const Dashboard = () => {
     window.addEventListener("smsAlertsViewed", handleSmsAlertsViewed);
     window.addEventListener("verificationUpdated", handleVerificationUpdated);
     window.addEventListener("pollVoted", handlePollVoted);
+    window.addEventListener("pollsViewed", handlePollsViewed);
 
     return () => {
       clearInterval(pollInterval);
@@ -227,6 +234,7 @@ const Dashboard = () => {
       window.removeEventListener("smsAlertCreated", handleSmsCreated);
       window.removeEventListener("smsAlertsViewed", handleSmsAlertsViewed);
       window.removeEventListener("pollVoted", handlePollVoted);
+      window.removeEventListener("pollsViewed", handlePollsViewed);
       window.removeEventListener(
         "verificationUpdated",
         handleVerificationUpdated

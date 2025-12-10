@@ -525,6 +525,12 @@ export const notifications = {
     });
   },
 
+  markPollsAsRead: async () => {
+    return apiClient("/notifications/mark-polls-read", {
+      method: "PATCH",
+    });
+  },
+
   markVerificationAsRead: async () => {
     return apiClient("/notifications/mark-verification-read", {
       method: "PATCH",
