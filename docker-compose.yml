@@ -9,8 +9,17 @@ services:
       - "5000:5000"
     networks:
       - npm_default
-    env_file:
-      - ./backend/.env
+    environment:
+      - MONGODB_URI
+      - JWT_SECRET
+      - PORT
+      - SMTP_HOST
+      - SMTP_PORT
+      - SMTP_EMAIL
+      - SMTP_PASSWORD
+      - FROM_EMAIL
+      - FROM_NAME
+      - FRONTEND_URL
 
   frontend:
     build: ./frontend
