@@ -1,9 +1,25 @@
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 // Required environment variables
-const requiredEnvVars = ["MONGODB_URI", "JWT_SECRET", "PORT", "SMTP_HOST", "SMTP_PORT", "SMTP_EMAIL", "SMTP_PASSWORD", "FROM_EMAIL", "FROM_NAME", "FRONTEND_URL"];
+const requiredEnvVars = [
+  "MONGODB_URI",
+  "JWT_SECRET",
+  "PORT",
+  "SMTP_HOST",
+  "SMTP_PORT",
+  "SMTP_EMAIL",
+  "SMTP_PASSWORD",
+  "FROM_EMAIL",
+  "FROM_NAME",
+  "FRONTEND_URL",
+];
 
 // Optional environment variables with defaults
 const optionalEnvVars = {
