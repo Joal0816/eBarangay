@@ -18,8 +18,8 @@ import statsRoutes from "./routes/stats";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load environment variables
-dotenv.config();
+// Load environment variables from root .env file
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const app: Express = express();
 const PORT: number = parseInt(process.env.PORT || "5000", 10);
@@ -35,7 +35,40 @@ connectDB().catch((error) => {
 });
 
 // Middleware
-app.use(cors());
+// Configure CORS for web, desktop (Electron), and mobile (Capacitor) platforms
+const corsOptions = {
+  origin: function (
+    origin: string | undefined,
+    callback: (err: Error | null, allow?: boolean) => void
+  ) {
+    const allowedOrigins = [
+      "http://localhost:5173", // Web development
+      "http://localhost:3000", // Web production
+      "http://localhost:4200", // Alternative web dev port
+      "capacitor://localhost", // Capacitor iOS
+      "ionic://localhost", // Ionic
+      "file://", // Electron
+      process.env.FRONTEND_URL || "", // Environment variable for production
+    ].filter(Boolean);
+
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    if (
+      allowedOrigins.includes(origin) ||
+      process.env.NODE_ENV === "development"
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

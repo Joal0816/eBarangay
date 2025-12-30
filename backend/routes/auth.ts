@@ -376,7 +376,7 @@ router.post(
 
       console.log(
         "Verification documents in response:",
-        userResponse.verificationDocuments?.length
+        (userResponse as any).verificationDocuments?.length
       );
 
       res.json(userResponse);
