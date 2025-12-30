@@ -455,7 +455,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <img
-                  src="/ebarangay-logo.svg"
+                  src="/ebarangay-logo.png"
                   alt="BarangayConnect"
                   className="h-10 w-10 rounded-lg shadow-lg"
                 />
